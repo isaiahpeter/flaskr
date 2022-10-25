@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block header %}{{ post['title']}}{% endblock %}
+{% block content %}
+<h1>{{ post['title']}}</h1>
+<p>Published {{ post['author'] }} by</p> 
+{{ post['body']|linebreaks }}
+{% endblock %}

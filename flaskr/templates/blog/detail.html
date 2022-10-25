@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block header %}{% endblock %}
+{% block content %}
+
+<h1>{{ post['title']}}</h1>
+<p>Published {{post['created'].strftime('%Y-%m-%d') }} by  {{ post['username'] }}. </p> 
+{{ post['body'] }}
+
+<a class="action" href="{{ url_for('blog.comment') }}">New Comment</a>
+
+{{ comment['body'] }}
+{% endblock %}
