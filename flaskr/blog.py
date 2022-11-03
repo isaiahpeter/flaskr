@@ -1,9 +1,21 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request, url_for)
+from flask import (Blueprint,Flask, flash, g, redirect, render_template, request, url_for)
 from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from werkzeug.utils import secure_filename
+import os
 
+app = Flask(__name__)
 bp = Blueprint('blog', __name__)
+
+
+upload_folder = '/home/isaiah/myproject/flaskr/static/images'
+allowed_extensions = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+app.config['upload_folder'] = upload_folder
+img_folder = os.path.join('static', 'images')
+app.config['upload_folder'] = img_folder
+Flask_Logo = os.path.join(app.config['upload_folder'], 'isaiah_peter.jpg')
+
 @bp.route('/')
 def index():
     db = get_db()
@@ -12,7 +24,7 @@ def index():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
         ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+    return render_template('blog/index.html', posts=posts, user_image=Flask_Logo)
    
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -140,3 +152,22 @@ def detail(id):
     comment = get_comment()
     return render_template('blog/detail.html', post=post, comment=comment)
 
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+@bp.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['upload_folder'], filename))
+            return redirect(url_for('blog.index', filename=filename))
+    return render_template('blog/upload_file.html')

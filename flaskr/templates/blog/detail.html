@@ -3,6 +3,8 @@
 {% block content %}
 
 <h1>{{ post['title']}}</h1>
+<img src="" alt=""/>
+
 <p>Published {{post['created'].strftime('%Y-%m-%d') }} by  {{ post['username'] }}. </p> 
 {{ post['body'] }}
 
